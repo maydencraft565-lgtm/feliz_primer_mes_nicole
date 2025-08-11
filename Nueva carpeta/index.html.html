@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Feliz primer mes, Nicole</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background-color: black;
+    }
+    canvas {
+        display: block;
+    }
+    #centerText {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 3em;
+        color: red;
+        font-family: Arial, sans-serif;
+        text-shadow: 0 0 10px rgba(255, 0, 0, 0.8), 0 0 20px rgba(255, 0, 0, 0.6);
+        animation: glow 2s ease-in-out infinite alternate;
+        pointer-events: none;
+    }
+    @keyframes glow {
+        from { text-shadow: 0 0 10px red, 0 0 20px darkred; }
+        to { text-shadow: 0 0 20px red, 0 0 40px crimson; }
+    }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div id="centerText">Feliz primer mes, te amo</div>
+<script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    const palabras = ["Te amo Nicole", "Eres el amor de mi vida", "💕"];
+    const particulas = [];
+
+    class Particula {
+        constructor(texto) {
+            this.texto = texto;
+            this.x = Math.random() * width;
+            this.y = Math.random() * height - height;
+            this.velY = 1 + Math.random() * 1.5;
+            this.velX = (Math.random() - 0.5) * 0.5;
+            this.z = Math.random() * 2 + 0.5; // Profundidad
+            this.size = 16 * this.z;
+        }
+        update() {
+            this.y += this.velY * this.z;
+            this.x += this.velX * this.z;
+            if (this.y > height + 50) {
+                this.y = -50;
+                this.x = Math.random() * width;
+                this.z = Math.random() * 2 + 0.5;
+                this.size = 16 * this.z;
+            }
+        }
+        draw() {
+            ctx.font = `${this.size}px Arial`;
+            ctx.fillStyle = "red";
+            ctx.globalAlpha = Math.min(1, this.z);
+            ctx.filter = `blur(${(2 - this.z) * 1.5}px)`;
+            ctx.fillText(this.texto, this.x, this.y);
+            ctx.filter = "none";
+            ctx.globalAlpha = 1;
+        }
+    }
+
+    for (let i = 0; i < 50; i++) {
+        particulas.push(new Particula(palabras[Math.floor(Math.random() * palabras.length)]));
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        for (let p of particulas) {
+            p.update();
+            p.draw();
+        }
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener("resize", () => {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+    });
+</script>
+</body>
+</html>
